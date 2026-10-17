@@ -1,0 +1,154 @@
+<div class="min-h-screen bg-background text-foreground flex flex-col">
+  <!-- Tenant Header Banner -->
+  <header class="border-b border-border/60 bg-card/60 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg border border-primary/20">
+          <ng-icon name="lucideStore" class="text-xl" />
+        </div>
+        <div>
+          <h1 class="text-lg font-extrabold tracking-tight capitalize">
+            {{ storeSlug() || 'Boutique' }}
+          </h1>
+          <p class="text-[11px] text-muted-foreground font-mono">
+            {{ storeSlug() }}.yetufy.com
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+          <ng-icon name="lucideSparkles" class="text-xs" />
+          <span>Boutique en ligne</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section of Store -->
+  <section class="border-b border-border/40 bg-gradient-to-b from-primary/5 via-transparent to-transparent py-12 sm:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+        <ng-icon name="lucideTag" class="text-xs" />
+        <span>Catalogue Officiel</span>
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground capitalize">
+        Bienvenue chez {{ storeSlug() }}
+      </h2>
+      <p class="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">
+        Découvrez nos produits exclusifs, nos meilleures offres et commandez directement en ligne.
+      </p>
+    </div>
+  </section>
+
+  <!-- Products Section -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h3 class="text-2xl font-bold tracking-tight text-foreground">Nos Produits</h3>
+        <p class="text-xs sm:text-sm text-muted-foreground">Articles disponibles dans cette boutique</p>
+      </div>
+
+      <div class="text-xs font-semibold text-muted-foreground">
+        {{ products().length }} produit(s)
+      </div>
+    </div>
+
+    <!-- Loading Skeletons -->
+    @if (isLoading()) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="rounded-2xl border border-border/60 bg-card p-4 space-y-3">
+            <hlm-skeleton class="h-44 w-full rounded-xl" />
+            <hlm-skeleton class="h-5 w-3/4 rounded-md" />
+            <hlm-skeleton class="h-4 w-1/2 rounded-md" />
+            <div class="pt-2 flex justify-between items-center">
+              <hlm-skeleton class="h-6 w-16 rounded-md" />
+              <hlm-skeleton class="h-8 w-20 rounded-lg" />
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Products Grid -->
+      @if (products().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          @for (product of products(); track product.id) {
+            <div class="group rounded-2xl border border-border/70 bg-card hover:border-primary/50 overflow-hidden flex flex-col justify-between transition-all duration-200 hover:shadow-md">
+              <!-- Image Container -->
+              <div class="relative aspect-square w-full bg-muted/40 overflow-hidden flex items-center justify-center">
+                @if (product.image_principale || product.image_thumb || product.image_url) {
+                  <img
+                    [src]="product.image_principale || product.image_thumb || product.image_url"
+                    [alt]="product.nom"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                } @else {
+                  <div class="text-muted-foreground/40 flex flex-col items-center gap-1">
+                    <ng-icon name="lucideShoppingBag" class="text-4xl" />
+                    <span class="text-[10px]">Image non disponible</span>
+                  </div>
+                }
+
+                <!-- Promotion / Badge -->
+                @if (product.badge) {
+                  <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary text-primary-foreground shadow-xs">
+                    {{ product.badge }}
+                  </span>
+                } @else if (product.est_en_promotion) {
+                  <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground shadow-xs">
+                    -{{ product.reduction_pourcentage || 0 }}%
+                  </span>
+                }
+              </div>
+
+              <!-- Content -->
+              <div class="p-4 flex flex-col flex-1 justify-between gap-3">
+                <div class="space-y-1">
+                  <h4 class="font-bold text-sm text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+                    {{ product.nom }}
+                  </h4>
+                  @if (product.short_description || product.description) {
+                    <p class="text-xs text-muted-foreground line-clamp-2">
+                      {{ product.short_description || product.description }}
+                    </p>
+                  }
+                </div>
+
+                <!-- Price and CTA -->
+                <div class="pt-2 border-t border-border/40 flex items-center justify-between">
+                  <div>
+                    <span class="text-base font-extrabold text-foreground">
+                      {{ product.prix_actuel ?? product.prix_ttc ?? product.prix ?? 0 }} CDF
+                    </span>
+                    @if (product.est_en_promotion && product.prix_ttc && product.prix_actuel && product.prix_actuel < product.prix_ttc) {
+                      <span class="text-xs text-muted-foreground line-through ml-1">
+                        {{ product.prix_ttc }} CDF
+                      </span>
+                    }
+                  </div>
+
+                  <button hlmBtn size="sm" class="cursor-pointer">
+                    <ng-icon name="lucideShoppingBag" class="text-xs mr-1" />
+                    <span>Acheter</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Empty State -->
+        <div class="text-center py-20 px-4 rounded-3xl border border-border/60 bg-card max-w-md mx-auto space-y-4">
+          <div class="h-16 w-16 mx-auto rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
+            <ng-icon name="lucideShoppingBag" class="text-3xl" />
+          </div>
+          <h4 class="text-xl font-bold text-foreground">Aucun produit pour le moment</h4>
+          <p class="text-xs sm:text-sm text-muted-foreground">
+            Cette boutique n'a pas encore publié d'articles dans son catalogue.
+          </p>
+        </div>
+      }
+    }
+  </main>
+</div>

@@ -1,0 +1,178 @@
+<div class="min-h-screen bg-background text-foreground flex flex-col">
+  <!-- Top Minimal Bar -->
+  <header class="border-b border-border/50 bg-background/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg border border-primary/20">
+          Y
+        </div>
+        <span class="font-extrabold text-lg tracking-tight">Yetufy</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">Boutiques</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          (click)="logout()"
+          class="text-muted-foreground hover:text-destructive flex items-center gap-1.5 text-xs font-medium cursor-pointer"
+        >
+          <ng-icon name="lucideLogOut" class="text-sm" />
+          <span>Déconnexion</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14">
+    <!-- Header Titles -->
+    <div class="max-w-2xl mb-10">
+      
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+        Bonjour, {{ userName() }}
+      </h1>
+      <p class="text-muted-foreground mt-2 text-sm sm:text-base leading-relaxed">
+        Sélectionnez la boutique avec laquelle vous souhaitez interagir pour voir ses produits, ou accédez directement à son tableau de bord d'administration.
+      </p>
+    </div>
+
+    <!-- Loading Skeleton -->
+    @if (isLoading()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="p-6 rounded-2xl border border-border/60 bg-card space-y-4">
+            <div class="flex items-center justify-between">
+              <hlm-skeleton class="h-12 w-12 rounded-xl" />
+              <hlm-skeleton class="h-6 w-20 rounded-full" />
+            </div>
+            <hlm-skeleton class="h-6 w-3/4 rounded-md" />
+            <hlm-skeleton class="h-4 w-1/2 rounded-md" />
+            <div class="pt-4 border-t border-border/40 flex gap-2">
+              <hlm-skeleton class="h-9 flex-1 rounded-lg" />
+              <hlm-skeleton class="h-9 flex-1 rounded-lg" />
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Store Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (tenant of tenants(); track tenant.id) {
+          <div
+            class="group relative rounded-2xl border border-border/70 bg-card/70 hover:bg-card p-6 transition-all duration-200 hover:shadow-lg hover:border-primary/50 flex flex-col justify-between"
+          >
+            <!-- Card Header -->
+            <div>
+              <div class="flex items-start justify-between gap-3 mb-4">
+                <div class="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl border border-primary/20 group-hover:scale-105 transition-transform">
+                  <ng-icon name="lucideStore" class="text-2xl" />
+                </div>
+
+                <!-- Status Badge -->
+                @if (tenant.statut === 'actif' || tenant.is_active) {
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Active
+                  </span>
+                } @else if (tenant.statut === 'en_attente') {
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                    <ng-icon name="lucideClock" class="text-xs" />
+                    En attente
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-destructive/10 text-destructive border border-destructive/20">
+                    <ng-icon name="lucideShieldAlert" class="text-xs" />
+                    Suspendue
+                  </span>
+                }
+              </div>
+
+              <!-- Store Info -->
+              <h3 class="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">
+                {{ tenant.raison_sociale }}
+              </h3>
+
+              <div class="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+                <a
+                  [href]="tenantContext.getTenantUrl(tenant)"
+                  target="_blank"
+                  class="hover:underline hover:text-primary transition-colors flex items-center gap-1"
+                >
+                  <span>{{ tenant.slug }}.yetufy.com</span>
+                  <ng-icon name="lucideExternalLink" class="text-[10px]" />
+                </a>
+              </div>
+
+              @if (tenant.pivot?.is_owner) {
+                <div class="mt-3 inline-block">
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+                    Propriétaire
+                  </span>
+                </div>
+              }
+            </div>
+
+            <!-- Card Actions -->
+            <div class="mt-6 pt-4 border-t border-border/50 flex flex-col gap-2">
+              <button
+                hlmBtn
+                (click)="selectStoreAndManage(tenant)"
+                class="w-full flex items-center justify-center gap-2 cursor-pointer font-semibold shadow-xs"
+              >
+                <span>Gérer l'admin</span>
+                <ng-icon name="lucideArrowRight" class="text-sm" />
+              </button>
+
+              <button
+                hlmBtn
+                variant="outline"
+                (click)="selectStoreAndView(tenant)"
+                class="w-full flex items-center justify-center gap-2 cursor-pointer text-xs"
+              >
+                <ng-icon name="lucideExternalLink" class="text-xs" />
+                <span>Voir la boutique publique</span>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Add New Store Card -->
+        <a
+          routerLink="/tenant-signup"
+          class="rounded-2xl border-2 border-dashed border-border/80 hover:border-primary/60 bg-muted/20 hover:bg-muted/40 p-6 flex flex-col items-center justify-center text-center transition-all duration-200 cursor-pointer min-h-[260px] group"
+        >
+          <div class="h-14 w-14 rounded-2xl bg-muted group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center mb-4 transition-colors">
+            <ng-icon name="lucidePlus" class="text-2xl" />
+          </div>
+          <h4 class="font-bold text-base text-foreground group-hover:text-primary transition-colors">
+            Créer une nouvelle boutique
+          </h4>
+          <p class="text-xs text-muted-foreground mt-1 max-w-[200px]">
+            Lancez un autre magasin en quelques étapes simples
+          </p>
+        </a>
+      </div>
+
+      <!-- Empty State if no stores -->
+      @if (tenants().length === 0) {
+        <div class="text-center py-16 px-4 rounded-3xl border border-border/60 bg-card max-w-xl mx-auto space-y-4">
+          <div class="h-16 w-16 mx-auto rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+            <ng-icon name="lucideBuilding2" class="text-3xl" />
+          </div>
+          <h3 class="text-2xl font-bold text-foreground">Vous n'avez pas encore de boutique</h3>
+          <p class="text-muted-foreground text-sm max-w-md mx-auto">
+            Créez votre première boutique Yetufy pour commencer à vendre vos produits et gérer votre catalogue en ligne.
+          </p>
+          <div class="pt-2">
+            <a hlmBtn routerLink="/tenant-signup" class="cursor-pointer font-semibold">
+              <ng-icon name="lucidePlus" class="mr-2 text-base" />
+              Créer ma première boutique
+            </a>
+          </div>
+        </div>
+      }
+    }
+  </main>
+</div>
