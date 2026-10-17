@@ -1,0 +1,86 @@
+<header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <section class="grid grid-cols-3 items-center h-[8vh] w-[90vw] md:w-[80vw] mx-auto">
+        
+        <!-- 1. Left: Brand Logo -->
+        <div class="flex items-center">
+            <a routerLink="/" class="text-xl font-bold tracking-tight cursor-pointer">
+                Logo
+            </a>
+        </div>
+
+        <!-- 2. Center: Navigation Menu (Hidden on mobile, visible on desktop) -->
+         <nav hlmNavigationMenu class="hidden md:flex justify-center">
+            <ul hlmNavigationMenuList class="flex items-center gap-6">
+                <li hlmNavigationMenuItem>
+                    <button hlmNavigationMenuTrigger>Entreprises</button>
+                    <hlm-navigation-menu-content *hlmNavigationMenuPortal>
+                        <ul class="w-96 p-2">
+                            <li>
+                                <a hlmNavigationMenuLink routerLink="/documentation/introduction" class="block p-2 rounded-md hover:bg-muted transition">
+                                    <div class="flex flex-col gap-1 text-sm">
+                                        <div class="leading-none font-medium">Introduction</div>
+                                        <div class="text-muted-foreground line-clamp-2">Re-usable components built with Tailwind CSS.</div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a hlmNavigationMenuLink routerLink="/documentation/installation" class="block p-2 rounded-md hover:bg-muted transition">
+                                    <div class="flex flex-col gap-1 text-sm">
+                                        <div class="leading-none font-medium">Installation</div>
+                                        <div class="text-muted-foreground line-clamp-2">
+                                            How to install dependencies and structure your app.
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a hlmNavigationMenuLink routerLink="/documentation/typography" class="block p-2 rounded-md hover:bg-muted transition">
+                                    <div class="flex flex-col gap-1 text-sm">
+                                        <div class="leading-none font-medium">Typography</div>
+                                        <div class="text-muted-foreground line-clamp-2">Styles for headings, paragraphs, lists...etc</div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </hlm-navigation-menu-content>
+                </li>
+                <li hlmNavigationMenuItem>
+                    <a hlmNavigationMenuLink routerLink="/produits" class="text-sm font-medium transition-colors hover:text-primary">Produits</a>
+                </li>
+                <li hlmNavigationMenuItem>
+                    <a hlmNavigationMenuLink routerLink="/services" class="text-sm font-medium transition-colors hover:text-primary">Service</a>
+                </li>
+                <li hlmNavigationMenuItem>
+                    <a hlmNavigationMenuLink routerLink="/about" class="text-sm font-medium transition-colors hover:text-primary">A propos</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 3. Right: E-commerce Actions & Auth -->
+        <div class="flex items-center justify-end gap-3">
+            <button hlmBtn variant="ghost" routerLink="/login" class="hidden sm:inline-flex cursor-pointer text-sm font-medium">
+                Se connecter
+            </button>
+            <button hlmBtn routerLink="/register" class="cursor-pointer text-sm shadow-sm">
+                Créer votre boutique
+            </button>
+            <div class="flex items-center gap-1 border-l border-border pl-3">
+      <button (click)="toggleTheme()" aria-label="Toggle theme" class="flex items-center justify-center rounded-lg p-2 hover:bg-accent transition-colors cursor-pointer">
+        @if ((themeService.theme$ | async) === 'dark'){
+          <ng-icon name="lucideSun" size="22" />
+        } @else {
+          <ng-icon name="lucideMoon" size="22" />
+        }
+      </button>
+    </div>
+            
+            <!-- Mobile Menu Trigger Button (Placeholder for your mobile drawer/menu toggle) -->
+            <button class="md:hidden p-2 text-muted-foreground hover:text-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+
+    </section>
+</header>
